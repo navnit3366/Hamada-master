@@ -1,0 +1,111 @@
+#
+# Input file for conduction case
+#
+nout = 3000       # Number of output timesteps
+timestep = 1.*1e-1 #Time between outputs
+
+# Number of points in z
+MZ = 65
+
+#number of guard cells
+MYG = 1
+MXG = 0
+
+NXPE = 1
+
+#Including the grid file
+grid = "/home/aske/test/ThreeDdiffusion/Y/fieldaligned.grd.nc"
+
+#Twistshift
+
+TwistShift = True
+
+[output]
+floats = false #false -> output in doubles
+
+[mesh]  
+#ixseps1 = -1
+#ixseps2 = -1
+
+#nx = internals gridpoints + guardcells
+nx = 20
+
+#ny = internal gridpoints
+ny = 45
+
+Lx = 1. 
+Ly = 1.
+
+dump_format="nc"     # Write NetCDF format files
+
+#grid points are distributed symmetrically
+symmetricGlobalX = true 
+symmetricGlobalY = true
+
+#Constants for mapping back
+rtor = x
+
+##################################################
+[ddx]   # Methods used for perp (x) derivative terms
+
+first = C2
+second = C2
+upwind = W3
+flux = SPLIT
+
+[ddy]   # Methods used for parallel (y) derivative terms
+
+first = C2
+second = C2
+upwind = W3
+flux = SPLIT
+
+[ddz]   # Methods used for perp (z) derivative terms
+
+first = C2
+second = C2
+upwind = W3
+flux = SPLIT
+
+
+[solver] 
+
+type = pvode
+
+mms = false	
+
+atol = 1.0e-15 # absolute tolerance
+rtol = 1.0e-7  # relative tolerance
+mxstep = 1000000000
+
+[cyto]
+Dx =  0. # No X conduction
+Dy =  10.
+Dz =  0 # No Z conduction
+
+[all]
+
+scale = 1.0 
+xs_opt = 0
+ys_opt = 0
+zs_opt = 0
+
+[N]
+r = 0.8
+R = 2
+q = 1.1234556436832658946825
+epsilon = r/R
+phi = -z + q*(2*atan(sqrt((1-epsilon)/(1+epsilon))*tan(y/2)))
+r_grid = 0.8 +0.4*x
+
+x_cart = (R + r_grid*cos(y))*sin(phi)
+y_cart = (R + r_grid*cos(y))*cos(phi)
+z_cart = r_grid*sin(y)
+
+function = 1. + sin(0.5*z)*sin(0.5*y)
+
+bndry_all = dirichlet_o2(1.)
+#bndry_all = neumann_o2(0)
+
+################################
+

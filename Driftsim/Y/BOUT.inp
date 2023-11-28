@@ -1,0 +1,147 @@
+#
+# Input file for conduction case
+#
+nout = 300       # Number of output timesteps
+timestep = 0.5*1e-2 #Time between outputs
+
+# Number of points in z
+MZ = 65
+
+#number of guard cells
+MYG = 1
+MXG = 1
+
+NXPE = 1
+NYPE = 1
+
+#Including the grid file
+grid = "/home/aske/Driftsim/Y/fieldaligned.grd.nc"
+
+#Twistshift
+
+TwistShift = True
+
+
+[output]
+floats = false #false -> output in doubles
+
+[mesh]  
+#ixseps1 = -1
+#ixseps2 = -1
+
+#nx = internals gridpoints + guardcells
+nx = 20
+
+#ny = internal gridpoints
+ny = 45
+
+Lx = 1. 
+Ly = 1.
+
+B0 = 2
+
+dump_format="nc"     # Write NetCDF format files
+
+r = 0.8
+R = 2
+q = 1.1234556436832658946825
+epsilon = r/R
+pi = Pi
+
+#grid points are distributed symmetrically
+symmetricGlobalX = true 
+symmetricGlobalY = true
+
+#Constants for mapping back
+
+[xSec]
+x_ = x
+
+bndry_all   = dirichlet_o4(xSec:x_)
+
+[ySec]
+y_ = y
+
+bndry_all   = dirichlet_o4(ySec:y_)
+
+[zSec]
+z_ = z
+
+bndry_all   = dirichlet_o4(zSec:z_)
+
+[laplace]
+
+# Inner boundary flag is set to be cylinder like (see the manual for the
+# numbers)
+inner_boundary_flags = 1024
+# Outer boundary flag
+# 0 - dirichlet 0 is used
+outer_boundary_flags = 0
+include_yguards = false # Do invert for the boundary cells
+global_flags = 4        # Only one guard in the x boundary for inner and outer
+
+##################################################
+[ddx]   # Methods used for perp (x) derivative terms
+
+first = C2
+second = C2
+upwind = W3
+flux = SPLIT
+
+[ddy]   # Methods used for parallel (y) derivative terms
+
+first = C2
+second = C2
+upwind = W3
+flux = SPLIT
+
+[ddz]   # Methods used for perp (z) derivative terms
+
+first = C2
+second = C2
+upwind = W3
+flux = SPLIT
+
+
+[solver] 
+
+type = pvode
+
+mms = false	
+
+atol = 1.0e-15 # absolute tolerance
+rtol = 1.0e-7  # relative tolerance
+mxstep = 1000000000
+
+[cyto]
+Dx =  0. # No X conduction
+Dy =  20.
+Dz =  0 # No Z conduction
+
+[all]
+
+scale = 1. 
+xs_opt = 0
+ys_opt = 0
+zs_opt = 0
+
+[N]
+
+#particle density 
+
+function = (1-0.5*x)+0.0000000001*(sin(y)) #+ 0.0000001*cos(z)
+bndry_xin =  dirichlet_o2(1.)
+bndry_xout =  dirichlet_o2(.5)
+
+#modified vorticity \phi^* = \phi + p_i
+[vort]
+function = 0.
+bndry_xin =  dirichlet_o2(0.)
+bndry_xout = dirichlet_o2(0.)
+
+[phi]
+bndry_all = neumann_o4(0.)
+
+
+################################
+
